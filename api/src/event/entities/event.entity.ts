@@ -3,6 +3,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Location } from 'src/location/entities/location.entity';
 import { Invite } from 'src/invite/entities/invite.entity';
 import { Platform } from 'src/platform/entities/platform.entity';
+import { TypeEvent } from 'src/type_event/entities/type_event.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -11,21 +12,16 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
 export class Event {
   @PrimaryGeneratedColumn()
-  id_event: number;
+  id: number;
 
   @Column()
   event_name: string;
-
-  @ManyToOne(() => Location, (location) => location.events)
-  location: Location;
-
-  @Column()
-  event_type: string;
 
   @Column()
   date: Date;
@@ -42,6 +38,9 @@ export class Event {
   @Column('decimal')
   price: number;
 
+  @ManyToOne(() => Location, (location) => location.events)
+  location: Location;
+
   @ManyToOne(() => User, (user) => user.eventsCreated)
   creator: User;
 
@@ -54,4 +53,10 @@ export class Event {
   @ManyToMany(() => Platform)
   @JoinTable({ name: 'USE_PLATFORM' })
   platforms: Platform[];
+
+  @ManyToOne(() => TypeEvent, (typeEvent) => typeEvent.events, {
+    nullable: false,
+  })
+  @JoinColumn({ name: 'typeId' })
+  type: TypeEvent; // La relation avec TypeEvent remplace la colonne event_type
 }

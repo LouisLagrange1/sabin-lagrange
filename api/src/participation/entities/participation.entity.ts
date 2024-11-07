@@ -1,24 +1,26 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
 import { Event } from 'src/event/entities/event.entity';
+import { User } from 'src/user/entities/user.entity';
 
-@Entity()
+@Entity('participation')
 export class Participation {
   @PrimaryGeneratedColumn()
-  id_participation: number;
+  id: number;
 
   @Column()
   status: string;
 
-  @Column()
+  @Column({ nullable: true })
   comment: string;
 
-  @Column()
+  @Column({ nullable: true })
   rating: number;
 
-  @ManyToOne(() => User, (user) => user.participations)
-  user: User;
-
+  // Relation avec l'entité Event
   @ManyToOne(() => Event, (event) => event.participations)
   event: Event;
+
+  // Relation avec l'entité User
+  @ManyToOne(() => User, (user) => user.participations)
+  user: User;
 }

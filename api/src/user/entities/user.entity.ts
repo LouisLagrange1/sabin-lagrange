@@ -17,7 +17,7 @@ import { Invite } from 'src/invite/entities/invite.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id_user: number;
+  id: number;
 
   @Column()
   email: string;
@@ -31,7 +31,7 @@ export class User {
   @Column()
   interests: string;
 
-  @Column()
+  @Column('decimal', { precision: 3, scale: 1 })
   profile_rating: number;
 
   @ManyToOne(() => Location, (location) => location.users)

@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreatePlatformDto } from './create-platform.dto';
+import { IsString, IsOptional } from 'class-validator';
 
-export class UpdatePlatformDto extends PartialType(CreatePlatformDto) {}
+export class UpdatePlatformDto {
+  @IsString()
+  @IsOptional()
+  platform_name?: string;
+}

@@ -3,40 +3,64 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Patch,
+  Query,
 } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { Event } from './entities/event.entity';
 
-@Controller('event')
+@Controller('events')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
+  // Créer un nouvel événement
   @Post()
-  create(@Body() createEventDto: CreateEventDto) {
+  async create(@Body() createEventDto: CreateEventDto): Promise<Event> {
     return this.eventService.create(createEventDto);
   }
 
+  // Trouver tous les événements avec filtrage et pagination
   @Get()
-  findAll() {
-    return this.eventService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('event_name') event_name?: string,
+    @Query('date') date?: Date,
+    @Query('location_id') locationId?: number,
+    @Query('type_id') typeId?: number,
+  ): Promise<Event[]> {
+    return this.eventService.findAll(
+      page,
+      limit,
+      event_name,
+      date,
+      locationId,
+      typeId,
+    );
   }
 
+  // Trouver un événement par ID
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<Event> {
+    return this.eventService.findOne(id);
   }
 
+  // Mettre à jour un événement
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventService.update(+id, updateEventDto);
+  async update(
+    @Param('id') id: number,
+    @Body() updateEventDto: UpdateEventDto,
+  ): Promise<Event> {
+    return this.eventService.update(id, updateEventDto);
   }
 
+  // Supprimer un événement
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    return this.eventService.remove(id);
   }
 }

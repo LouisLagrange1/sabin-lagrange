@@ -1,34 +1,59 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Patch,
+  Query,
+} from '@nestjs/common';
 import { LocationService } from './location.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
+import { Location } from './entities/location.entity';
 
-@Controller('location')
+@Controller('locations')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
+  // Créer une nouvelle location
   @Post()
-  create(@Body() createLocationDto: CreateLocationDto) {
+  async create(
+    @Body() createLocationDto: CreateLocationDto,
+  ): Promise<Location> {
     return this.locationService.create(createLocationDto);
   }
 
+  // Récupérer toutes les locations avec pagination et filtrage
   @Get()
-  findAll() {
-    return this.locationService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('city') city?: string,
+    @Query('region') region?: string,
+  ): Promise<Location[]> {
+    return this.locationService.findAll(page, limit, city, region);
   }
 
+  // Récupérer une location par son ID
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.locationService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<Location> {
+    return this.locationService.findOne(id);
   }
 
+  // Mettre à jour une location
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLocationDto: UpdateLocationDto) {
-    return this.locationService.update(+id, updateLocationDto);
+  async update(
+    @Param('id') id: number,
+    @Body() updateLocationDto: UpdateLocationDto,
+  ): Promise<Location> {
+    return this.locationService.update(id, updateLocationDto);
   }
 
+  // Supprimer une location
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.locationService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    return this.locationService.remove(id);
   }
 }

@@ -5,7 +5,7 @@ import { Event } from 'src/event/entities/event.entity';
 @Entity()
 export class Invite {
   @PrimaryGeneratedColumn()
-  id_invite: number;
+  id: number;
 
   @Column()
   comment: string;

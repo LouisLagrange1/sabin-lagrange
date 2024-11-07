@@ -4,7 +4,7 @@ import { Event } from 'src/event/entities/event.entity';
 @Entity()
 export class Platform {
   @PrimaryGeneratedColumn()
-  id_platform: number;
+  id: number;
 
   @Column()
   platform_name: string;

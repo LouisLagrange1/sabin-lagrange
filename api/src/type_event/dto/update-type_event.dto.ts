@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateTypeEventDto } from './create-type_event.dto';
+import { IsString, IsOptional } from 'class-validator';
 
-export class UpdateTypeEventDto extends PartialType(CreateTypeEventDto) {}
+export class UpdateTypeEventDto {
+  @IsString()
+  @IsOptional()
+  label?: string;
+}
