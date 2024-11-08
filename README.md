@@ -137,10 +137,61 @@ ng s
 localhost:4200
 ```
 
-## About the Project
+## À propos du projet
 
-Partify is developed using Nest.js & Angular.
+**Partify** est développé avec **Nest.js** et **Angular**, et utilise **TailwindCSS** pour le design frontend. La base de données est gérée avec **PostgreSQL**.
 
-To style the frontend of our project, we use the TailwindCSS library.
+## Structure de la base de données
 
-As mentioned earlier, we are using PostgreSQL for the database.
+### Partition de la table `event`
+
+Nous avons initialement essayé de partitionner la table `event` par date pour améliorer les performances de recherche. Cependant, en raison de certaines contraintes PostgreSQL (la clé primaire devant inclure toutes les colonnes de partition), cette solution n'a pas fonctionné comme prévu.
+
+```typescript
+// Création de la table partitionnée (non fonctionnelle)
+await queryRunner.query(`
+  CREATE TABLE "event" (
+    "id" SERIAL NOT NULL, 
+    "event_name" character varying NOT NULL, 
+    "date" TIMESTAMP NOT NULL, 
+    "time" character varying NOT NULL, 
+    "number_of_places" integer NOT NULL, 
+    "is_paid" boolean NOT NULL, 
+    "price" numeric NOT NULL, 
+    "locationId" integer, 
+    "creatorId" integer, 
+    "typeId" integer NOT NULL,
+    CONSTRAINT "PK_event" PRIMARY KEY ("id", "date")
+  ) PARTITION BY RANGE ("date");
+`)
+```
+
+## Vue matérialisée event_view
+
+Pour améliorer les performances de récupération des événements, nous avons créé une vue matérialisée qui joint les tables event, location, type_event, et user, afin de récupérer les événements avec leurs informations associées de manière plus rapide.
+
+```typescript
+// Création de la vue matérialisée
+await queryRunner.query(`
+  CREATE MATERIALIZED VIEW "event_view" AS
+  SELECT 
+    e.id,
+    e.event_name,
+    e.date,
+    e.time,
+    e.number_of_places,
+    e.is_paid,
+    e.price,
+    l.address AS location_address,
+    t.label AS type_label,
+    u.username AS creator_username
+  FROM "event" e
+  LEFT JOIN "location" l ON e.locationId = l.id
+  LEFT JOIN "type_event" t ON e.typeId = t.id
+  LEFT JOIN "user" u ON e.creatorId = u.id;
+`)
+```
+
+## Pagination et optimisations
+
+La pagination a été ajoutée dans tous les contrôleurs et services pour limiter le nombre d'événements récupérés. De plus, nous avons optimisé le service eventService pour éviter les problèmes de requêtes N+1 en groupant les données liées dans des requêtes plus efficaces.
