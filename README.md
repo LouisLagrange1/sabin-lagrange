@@ -192,6 +192,6 @@ await queryRunner.query(`
 `)
 ```
 
-## Pagination et optimisation
+## Pagination et optimisations
 
 La pagination a été ajoutée dans tous les contrôleurs et services pour limiter le nombre d'événements récupérés. De plus, nous avons optimisé le service eventService pour éviter les problèmes de requêtes N+1 en groupant les données liées dans des requêtes plus efficaces.
