@@ -40,13 +40,13 @@ dataSource
       typeEventRepository,
     );
     await seedGames(gameRepository, userRepository);
-    await seedInvites(inviteRepository, userRepository, eventRepository);
     await seedParticipations(
       participationRepository,
       userRepository,
       eventRepository,
     );
     await seedPlatforms(platformRepository, eventRepository);
+    await seedInvites(inviteRepository, userRepository, eventRepository);
 
     console.log('Database seeded successfully!');
     process.exit(0);

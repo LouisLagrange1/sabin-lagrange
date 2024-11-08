@@ -7,6 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Location } from '../location/entities/location.entity';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
@@ -21,25 +22,29 @@ export class UserService {
     private cacheManager: Cache,
   ) {}
 
-  // Créer un utilisateur
   async create(createUserDto: CreateUserDto): Promise<User> {
-    // Vérification de l'existence de la location
+    // Vérification de l'existence de la localisation
     const location = await this.locationRepository.findOne({
       where: { id: createUserDto.locationId },
     });
+
     if (!location) {
       throw new NotFoundException(
         `Location with ID ${createUserDto.locationId} not found`,
       );
     }
 
-    // Création de l'utilisateur avec la localisation associée
+    // Hachage du mot de passe avant de l'ajouter à l'utilisateur
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+    // Création de l'utilisateur avec la localisation associée et le mot de passe haché
     const user = this.userRepository.create({
       ...createUserDto,
+      password: hashedPassword,
       location,
     });
 
-    // Sauvegarde de l'utilisateur
+    // Sauvegarde de l'utilisateur en base de données
     return this.userRepository.save(user);
   }
 
