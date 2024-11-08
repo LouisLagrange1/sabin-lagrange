@@ -1,0 +1,99 @@
+<div class="flex h-screen">
+  <!-- Section logo -->
+  <div class="flex-1 flex items-center justify-center">
+    <img src="assets/logo.png" class="h-60" />
+  </div>
+
+  <!-- Barre de séparation -->
+  <div class="w-px bg-gray-300"></div>
+
+  <!-- Section formulaire d'inscription -->
+  <div class="flex-1 flex items-center justify-center">
+    <form
+      [formGroup]="registerForm"
+      (ngSubmit)="onSubmit()"
+      class="w-full max-w-md bg-white p-8 shadow-lg rounded-lg"
+    >
+      <h2 class="text-3xl font-semibold text-center mb-8">Inscription</h2>
+
+      <!-- Champ email -->
+      <div class="mb-6">
+        <label for="email" class="block text-sm font-medium text-gray-700"
+          >Email</label
+        >
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Entrez votre email"
+        />
+        <div
+          *ngIf="
+            registerForm.get('email')?.invalid &&
+            registerForm.get('email')?.touched
+          "
+          class="text-red-500 text-sm"
+        >
+          Email invalide
+        </div>
+      </div>
+
+      <!-- Champ password -->
+      <div class="mb-6">
+        <label for="password" class="block text-sm font-medium text-gray-700"
+          >Mot de passe</label
+        >
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Entrez votre mot de passe"
+        />
+        <div
+          *ngIf="
+            registerForm.get('password')?.invalid &&
+            registerForm.get('password')?.touched
+          "
+          class="text-red-500 text-sm"
+        >
+          Mot de passe de 6 caractères minimum
+        </div>
+      </div>
+
+      <!-- Champ confirm password -->
+      <div class="mb-6">
+        <label
+          for="confirmPassword"
+          class="block text-sm font-medium text-gray-700"
+          >Confirmez le mot de passe</label
+        >
+        <input
+          id="confirmPassword"
+          type="password"
+          formControlName="confirmPassword"
+          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Confirmez votre mot de passe"
+        />
+        <div
+          *ngIf="
+            registerForm.errors && registerForm.get('confirmPassword')?.touched
+          "
+          class="text-red-500 text-sm"
+        >
+          Les mots de passe ne correspondent pas
+        </div>
+      </div>
+
+      <!-- Bouton d'inscription -->
+      <button
+        type="submit"
+        class="w-full py-2 bg-gray-800 text-white rounded-md hover:bg-gray-600 transition-colors duration-200"
+        [disabled]="registerForm.invalid"
+      >
+        <a href="/">S'inscrire</a>
+      </button>
+    </form>
+  </div>
+</div>
