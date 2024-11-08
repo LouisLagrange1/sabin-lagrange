@@ -84,7 +84,6 @@ export class EventService {
     return this.eventRepository.save(event);
   }
 
-  // Trouver tous les événements avec filtrage et pagination
   async findAll(
     page: number = 1,
     limit: number = 10,
@@ -102,31 +101,41 @@ export class EventService {
 
     const query = this.eventRepository.createQueryBuilder('event');
 
+    // Pagination
     query.skip((page - 1) * limit).take(limit);
 
-    // Filtrage par nom d'événement
+    // Jointures pour inclure location, user (organisateur), et type d'événement
+    query
+      .leftJoinAndSelect('event.location', 'location') // Jointure avec Location
+      .leftJoinAndSelect('event.creator', 'creator') // Jointure avec User (organisateur)
+      .leftJoinAndSelect('event.type', 'type'); // Jointure avec Type d'événement
+
+    // Filtrage par nom d'événement (si précisé)
     if (eventName) {
       query.andWhere('event.event_name LIKE :eventName', {
         eventName: `%${eventName}%`,
       });
     }
 
-    // Filtrage par date
+    // Filtrage par date (si précisée)
     if (date) {
       query.andWhere('event.date = :date', { date });
     }
 
-    // Filtrage par location
+    // Filtrage par locationId (si précisé)
     if (locationId) {
       query.andWhere('event.locationId = :locationId', { locationId });
     }
 
-    // Filtrage par type d'événement
+    // Filtrage par typeId (si précisé)
     if (typeId) {
       query.andWhere('event.typeId = :typeId', { typeId });
     }
 
+    // Exécution de la requête avec toutes les relations nécessaires (jointures)
     const events = await query.getMany();
+
+    // Mise en cache des événements récupérés
     await this.cacheManager.set(cacheKey, events, 300); // Mise en cache pour 5 minutes
 
     return events;

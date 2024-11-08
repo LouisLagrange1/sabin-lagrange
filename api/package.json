@@ -22,7 +22,7 @@
     "migration:generate": "npm run typeorm -- migration:generate",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm - migration:revert",
-    "seed": "npm run build && node dist/src/seed/seed.js"
+    "seed": "npm run build && node dist/database/seed/seed.js"
   },
   "dependencies": {
     "@faker-js/faker": "^9.2.0",
@@ -33,6 +33,7 @@
     "@nestjs/mapped-types": "^2.0.5",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/typeorm": "^10.0.2",
+    "bcryptjs": "^2.4.3",
     "cache-manager": "^5.7.6",
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",

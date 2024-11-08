@@ -1,36 +1,47 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-2xl font-bold mb-6 text-center">Soirées Disponibles</h1>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-    <!-- Boucle sur chaque soirée -->
-    <div
-      *ngFor="let soiree of soirees"
-      class="border border-gray-300 rounded-lg shadow-lg overflow-hidden"
-    >
-      <!-- Image de la soirée -->
-      <img
-        [src]="soiree.photoUrl"
-        alt="Image de la soirée"
-        class="h-48 w-full object-cover"
-      />
-      <!-- Infos de la soirée -->
-      <div class="p-4">
-        <h2 class="text-lg font-semibold mb-2">{{ soiree.type }}</h2>
-        <p class="text-gray-600">Ville : {{ soiree.ville }}</p>
-        <p class="text-gray-600">Organisateur : {{ soiree.organisateur }}</p>
-        <p *ngIf="soiree.prix > 0" class="text-gray-600">
-          Prix : {{ soiree.prix | currency : "EUR" }}
-        </p>
-        <p *ngIf="soiree.prix === 0" class="text-gray-600">Gratuit</p>
-        <p class="text-gray-600">
-          Date : {{ soiree.date | date : "shortDate" }}
-        </p>
-        <p class="text-gray-600">
-          Heure : {{ soiree.heure | date : "shortTime" }}
-        </p>
-        <p class="text-gray-600">
-          Places disponibles : {{ soiree.placesDisponibles }}
-        </p>
+<ng-container *ngIf="soirees$ | async as soirees">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6 text-center">Soirées Disponibles</h1>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div
+        *ngFor="let soiree of soirees"
+        class="border border-gray-300 rounded-lg shadow-lg overflow-hidden"
+      >
+        <div class="p-4">
+          <!-- Utilisation de event_name au lieu de type -->
+          <h2 class="text-lg font-semibold mb-2">{{ soiree.event_name }}</h2>
+
+          <!-- Utilisation de location.city si location existe -->
+          <p *ngIf="soiree.location" class="text-gray-600">
+            Ville : {{ soiree.location.city }}
+          </p>
+
+          <!-- Utilisation de creator.username ou de la propriété appropriée -->
+          <p *ngIf="soiree.creator" class="text-gray-600">
+            Organisateur : {{ soiree.creator.username }}
+          </p>
+
+          <!-- Si l'événement est payant, afficher le prix -->
+          <p *ngIf="soiree.is_paid" class="text-gray-600">
+            Prix : {{ soiree.price }}€
+          </p>
+
+          <!-- Si l'événement est gratuit -->
+          <p *ngIf="!soiree.is_paid" class="text-gray-600">Gratuit</p>
+
+          <!-- Affichage de la date avec le pipe date -->
+          <p class="text-gray-600">
+            Date : {{ soiree.date | date : "shortDate" }}
+          </p>
+
+          <!-- Affichage de l'heure avec la bonne syntaxe -->
+          <p class="text-gray-600">Heure : {{ soiree.time }}</p>
+
+          <!-- Affichage du nombre de places disponibles -->
+          <p class="text-gray-600">
+            Places disponibles : {{ soiree.number_of_places }}
+          </p>
+        </div>
       </div>
     </div>
   </div>
-</div>
+</ng-container>

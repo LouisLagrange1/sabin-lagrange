@@ -68,7 +68,7 @@ true = production
 4. Generate Database Migrations: Run the following command to generate the initial schema for the database:
 
    ```sh
-   npm run migration:generate --database/db/migrations/Initial_Schema
+   npm run migration:generate -- database/db/migrations/Initial_Schema
    ```
 
 5. Run the Migrations: After generating the migrations, apply them to the database with the command:
