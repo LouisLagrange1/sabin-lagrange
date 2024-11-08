@@ -23,7 +23,7 @@ Partify is a social network platform that allows users to search or post a party
 PORT=3000 //Default Port
 DATABASE_PASSWORD="your-password"
 DATABASE_USERNAME="postgres"
-DATABASE_PORT=5433
+DATABASE_PORT=
 DATABASE_NAME="party"
 DATABASE_HOST="localhost"
 NODE_ENV=false //Developement
@@ -50,7 +50,10 @@ DATABASE_HOST: Specifies the hostname or IP address of the database server. It t
 ```
 
 ```yaml
-NODE_ENV: Specifies the environment mode, e.g., "development" or "production". Set it to "development" for local testing.
+NODE_ENV: Specifies the environment mode, e.g., "false" or "true". Set it to "false" for local testing.
+
+false = development
+true = production
 ```
 
 2. Instamint uses PostgreSQL as its database. Make sure you have postgres installed and create a database. If your database name is not "party" make sure to change the name of your database in the .env file.
