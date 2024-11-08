@@ -1,9 +1,10 @@
+// src/user/dto/update-user.dto.ts
 import {
-  IsString,
-  IsOptional,
   IsEmail,
+  IsString,
   IsInt,
   IsPositive,
+  IsOptional,
 } from 'class-validator';
 
 export class UpdateUserDto {
@@ -28,4 +29,9 @@ export class UpdateUserDto {
   @IsPositive()
   @IsOptional()
   profile_rating?: number;
+
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  locationId?: number; // Pour mettre à jour la localisation
 }

@@ -12,8 +12,8 @@ import { GameModule } from './game/game.module';
 import { TypeEventModule } from './type_event/type_event.module';
 import { LocationModule } from './location/location.module';
 import { InviteModule } from './invite/invite.module';
-import { dataSource } from 'database/db/data-source';
 import { CacheModule } from '@nestjs/cache-manager';
+import { dataSource } from 'database/db/data-source';
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { CacheModule } from '@nestjs/cache-manager';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
-      ...dataSource.options, // Utilisez les options de la source de données
+      ...dataSource.options,
       autoLoadEntities: true,
     }),
     EventModule,

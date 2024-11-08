@@ -17,13 +17,11 @@ import { Event } from './entities/event.entity';
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
-  // Créer un nouvel événement
   @Post()
   async create(@Body() createEventDto: CreateEventDto): Promise<Event> {
     return this.eventService.create(createEventDto);
   }
 
-  // Trouver tous les événements avec filtrage et pagination
   @Get()
   async findAll(
     @Query('page') page: number = 1,

@@ -1,8 +1,7 @@
-import { IsString, IsNumber, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateInviteDto {
   @IsString()
-  @IsOptional()
   @IsNotEmpty()
   comment: string;
 
@@ -11,8 +10,8 @@ export class CreateInviteDto {
   rating: number;
 
   @IsNumber()
-  userId: number; // ID de l'utilisateur qui est l'invité
+  userId: number;
 
   @IsNumber()
-  eventId: number; // ID de l'événement auquel l'invitation appartient
+  eventId: number;
 }

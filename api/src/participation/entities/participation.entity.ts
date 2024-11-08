@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Event } from 'src/event/entities/event.entity';
 import { User } from 'src/user/entities/user.entity';
 
-@Entity('participation')
+@Entity()
 export class Participation {
   @PrimaryGeneratedColumn()
   id: number;
@@ -13,14 +13,12 @@ export class Participation {
   @Column({ nullable: true })
   comment: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'decimal', precision: 3, scale: 1 })
   rating: number;
 
-  // Relation avec l'entité Event
-  @ManyToOne(() => Event, (event) => event.participations)
-  event: Event;
-
-  // Relation avec l'entité User
   @ManyToOne(() => User, (user) => user.participations)
   user: User;
+
+  @ManyToOne(() => Event, (event) => event.participations)
+  event: Event;
 }

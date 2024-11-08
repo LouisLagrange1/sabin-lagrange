@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -31,19 +32,21 @@ export class ParticipationService {
   ): Promise<Participation> {
     const { userId, eventId, status, comment, rating } = createParticipationDto;
 
+    // Vérifier si l'utilisateur existe
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    const event = await this.eventRepository.findOne({
-      where: { id: eventId },
-    });
-
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
+    // Vérifier si l'événement existe
+    const event = await this.eventRepository.findOne({
+      where: { id: eventId },
+    });
     if (!event) {
       throw new NotFoundException(`Event with ID ${eventId} not found`);
     }
 
+    // Créer la participation
     const participation = this.participationRepository.create({
       status,
       comment,
@@ -70,9 +73,10 @@ export class ParticipationService {
       return cachedData;
     }
 
-    const query =
-      this.participationRepository.createQueryBuilder('participation');
-    query.skip((page - 1) * limit).take(limit);
+    const query = this.participationRepository
+      .createQueryBuilder('participation')
+      .skip((page - 1) * limit)
+      .take(limit);
 
     // Filtrage par statut de participation
     if (status) {
@@ -91,8 +95,11 @@ export class ParticipationService {
       query.andWhere('participation.eventId = :eventId', { eventId });
     }
 
+    // Récupération des participations
     const participations = await query.getMany();
-    await this.cacheManager.set(cacheKey, participations, 300);
+
+    // Mise en cache des participations
+    await this.cacheManager.set(cacheKey, participations, 300); // 5 minutes
 
     return participations;
   }
@@ -116,8 +123,16 @@ export class ParticipationService {
     id: number,
     updateParticipationDto: UpdateParticipationDto,
   ): Promise<Participation> {
-    await this.participationRepository.update(id, updateParticipationDto);
-    const updatedParticipation = await this.findOne(id);
+    const participation = await this.findOne(id); // Vérifie si la participation existe
+
+    // Mise à jour des champs de participation
+    const updatedParticipation = Object.assign(
+      participation,
+      updateParticipationDto,
+    );
+
+    // Sauvegarde de la participation mise à jour
+    await this.participationRepository.save(updatedParticipation);
 
     // Rafraîchir le cache
     await this.cacheManager.del(`participations_page_*`);
@@ -128,6 +143,8 @@ export class ParticipationService {
   // Supprimer une participation
   async remove(id: number): Promise<void> {
     const participation = await this.findOne(id);
+
+    // Supprimer la participation
     await this.participationRepository.remove(participation);
 
     // Supprimer le cache

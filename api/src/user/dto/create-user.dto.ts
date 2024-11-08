@@ -1,9 +1,10 @@
+// src/user/dto/create-user.dto.ts
 import {
-  IsString,
-  IsNotEmpty,
   IsEmail,
+  IsString,
   IsInt,
   IsPositive,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -26,4 +27,8 @@ export class CreateUserDto {
   @IsInt()
   @IsPositive()
   profile_rating: number;
+
+  @IsInt()
+  @IsPositive()
+  locationId: number; // Pour lier à une location
 }

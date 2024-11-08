@@ -8,6 +8,7 @@ export async function seedInvites(
   userRepository: Repository<User>,
   eventRepository: Repository<Event>,
 ) {
+  // Trouver un utilisateur et un événement existants
   const user = await userRepository.findOne({
     where: { email: 'user1@example.com' },
   });
@@ -15,10 +16,15 @@ export async function seedInvites(
     where: { event_name: 'Concert' },
   });
 
+  // Vérifier qu'on a trouvé l'utilisateur et l'événement
+  if (!user || !event) {
+    throw new Error('User or Event not found');
+  }
+
   const invites = [
     { comment: 'Looking forward to it!', rating: 5, user, event },
     { comment: 'Not sure about the date', rating: 3, user, event },
   ];
 
-  await inviteRepository.save(invites);
+  await inviteRepository.save(invites); // Assurez-vous que 'comment' n'est pas vide
 }

@@ -50,7 +50,7 @@ export class Event {
   @OneToMany(() => Invite, (invite) => invite.event)
   invites: Invite[];
 
-  @ManyToMany(() => Platform)
+  @ManyToMany(() => Platform, (platform) => platform.events)
   @JoinTable({ name: 'USE_PLATFORM' })
   platforms: Platform[];
 
@@ -58,5 +58,5 @@ export class Event {
     nullable: false,
   })
   @JoinColumn({ name: 'typeId' })
-  type: TypeEvent; // La relation avec TypeEvent remplace la colonne event_type
+  type: TypeEvent;
 }

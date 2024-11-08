@@ -24,8 +24,6 @@ export class InviteService {
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
   ) {}
-
-  // Créer une nouvelle invitation
   async create(createInviteDto: CreateInviteDto): Promise<Invite> {
     const { userId, eventId, comment, rating } = createInviteDto;
 
@@ -49,10 +47,10 @@ export class InviteService {
       user,
       event,
     });
+
     return this.inviteRepository.save(invite);
   }
-
-  // Trouver toutes les invitations avec pagination et cache
+  // Trouver toutes les invitations avec filtrage et pagination
   async findAll(
     page: number = 1,
     limit: number = 10,
@@ -62,12 +60,14 @@ export class InviteService {
     const cacheKey = `invites_page_${page}_limit_${limit}_user_${userId}_event_${eventId}`;
     const cachedData = await this.cacheManager.get<Invite[]>(cacheKey);
 
+    // Si des données sont en cache, retourner directement
     if (cachedData) {
       return cachedData;
     }
 
     const query = this.inviteRepository.createQueryBuilder('invite');
 
+    // Pagination
     query.skip((page - 1) * limit).take(limit);
 
     // Filtrage par userId
@@ -80,8 +80,11 @@ export class InviteService {
       query.andWhere('invite.eventId = :eventId', { eventId });
     }
 
+    // Exécuter la requête
     const invites = await query.getMany();
-    await this.cacheManager.set(cacheKey, invites, 300); // Mise en cache pour 5 minutes
+
+    // Mise en cache pour 5 minutes
+    await this.cacheManager.set(cacheKey, invites, 300);
 
     return invites;
   }
@@ -90,11 +93,13 @@ export class InviteService {
   async findOne(id: number): Promise<Invite> {
     const invite = await this.inviteRepository.findOne({
       where: { id },
-      relations: ['user', 'event'],
+      relations: ['user', 'event'], // Charger les relations utilisateur et événement
     });
+
     if (!invite) {
       throw new NotFoundException(`Invite with ID ${id} not found`);
     }
+
     return invite;
   }
 
@@ -102,6 +107,7 @@ export class InviteService {
   async update(id: number, updateInviteDto: UpdateInviteDto): Promise<Invite> {
     const invite = await this.findOne(id); // Vérifie si l'invitation existe
 
+    // Mettre à jour les propriétés de l'invitation
     const updatedInvite = Object.assign(invite, updateInviteDto);
     await this.inviteRepository.save(updatedInvite);
 

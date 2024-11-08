@@ -12,7 +12,6 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { Participation } from 'src/participation/entities/participation.entity';
 
 @Controller('users')
 export class UserController {
@@ -52,35 +51,5 @@ export class UserController {
   @Delete(':id')
   async remove(@Param('id') id: number): Promise<void> {
     return this.userService.remove(id);
-  }
-
-  // Ajouter des jeux proposés à un utilisateur
-  @Post(':id/games')
-  async addGamesToUser(
-    @Param('id') id: number,
-    @Body('gameIds') gameIds: number[], // Attendre un tableau d'ID de jeux
-  ): Promise<User> {
-    return this.userService.addGamesToUser(id, gameIds);
-  }
-
-  // Ajouter une participation à un utilisateur
-  @Post(':id/participations')
-  async addParticipationToUser(
-    @Param('id') id: number,
-    @Body()
-    {
-      eventId,
-      status,
-      comment,
-      rating,
-    }: { eventId: number; status: string; comment: string; rating: number },
-  ): Promise<Participation> {
-    return this.userService.addParticipationToUser(
-      id,
-      eventId,
-      status,
-      comment,
-      rating,
-    );
   }
 }

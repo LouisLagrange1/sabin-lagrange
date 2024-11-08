@@ -12,13 +12,13 @@ import { Cache } from 'cache-manager';
 export class MessageService {
   constructor(
     @InjectRepository(Message)
-    private messageRepository: Repository<Message>,
+    private readonly messageRepository: Repository<Message>,
 
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
 
     @Inject(CACHE_MANAGER)
-    private cacheManager: Cache,
+    private readonly cacheManager: Cache,
   ) {}
 
   // Créer un nouveau message
@@ -34,7 +34,7 @@ export class MessageService {
       throw new NotFoundException(`Sender with ID ${senderId} not found`);
     }
 
-    // Créer le message
+    // Créer et sauvegarder le message
     const message = this.messageRepository.create({
       content,
       message_date,
@@ -75,7 +75,9 @@ export class MessageService {
     }
 
     const messages = await query.getMany();
-    await this.cacheManager.set(cacheKey, messages, 300); // Mise en cache pour 5 minutes
+
+    // Mise en cache pour 5 minutes
+    await this.cacheManager.set(cacheKey, messages, 300);
 
     return messages;
   }
@@ -101,6 +103,7 @@ export class MessageService {
   ): Promise<Message> {
     const message = await this.findOne(id); // Vérifie si le message existe
 
+    // Mettre à jour le message avec les données reçues
     const updatedMessage = Object.assign(message, updateMessageDto);
     await this.messageRepository.save(updatedMessage);
 

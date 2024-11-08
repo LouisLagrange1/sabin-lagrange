@@ -19,13 +19,68 @@ export class EventService {
     @InjectRepository(Event)
     private eventRepository: Repository<Event>,
 
+    @InjectRepository(Location)
+    private locationRepository: Repository<Location>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+
+    @InjectRepository(TypeEvent)
+    private typeEventRepository: Repository<TypeEvent>,
+
+    @InjectRepository(Platform)
+    private platformRepository: Repository<Platform>,
+
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
   ) {}
 
-  // Créer un nouvel événement
+  // Créer un événement
   async create(createEventDto: CreateEventDto): Promise<Event> {
-    const event = this.eventRepository.create(createEventDto);
+    // Vérification de l'existence du TypeEvent
+    const typeEvent = await this.typeEventRepository.findOne({
+      where: { id: createEventDto.typeId },
+    });
+    if (!typeEvent) {
+      throw new NotFoundException(
+        `TypeEvent with ID ${createEventDto.typeId} not found`,
+      );
+    }
+
+    // Récupération de la Location et du Creator
+    const location = await this.locationRepository.findOne({
+      where: { id: createEventDto.locationId }, // Modification ici
+    });
+    const creator = await this.userRepository.findOne({
+      where: { id: createEventDto.creatorId }, // Modification ici
+    });
+
+    if (!location) {
+      throw new NotFoundException(
+        `Location with ID ${createEventDto.locationId} not found`,
+      );
+    }
+    if (!creator) {
+      throw new NotFoundException(
+        `Creator with ID ${createEventDto.creatorId} not found`,
+      );
+    }
+
+    // Récupération des plateformes
+    const platforms = await this.platformRepository.findByIds(
+      createEventDto.platformIds,
+    );
+
+    // Création de l'événement avec toutes les relations correctement assignées
+    const event = this.eventRepository.create({
+      ...createEventDto,
+      location,
+      creator,
+      platforms,
+      type: typeEvent, // Association du type d'événement
+    });
+
+    // Sauvegarde de l'événement
     return this.eventRepository.save(event);
   }
 
@@ -72,7 +127,7 @@ export class EventService {
     }
 
     const events = await query.getMany();
-    await this.cacheManager.set(cacheKey, events, 300); // Mise en cache des événements pour 5 minutes
+    await this.cacheManager.set(cacheKey, events, 300); // Mise en cache pour 5 minutes
 
     return events;
   }
@@ -93,11 +148,16 @@ export class EventService {
 
   // Mettre à jour un événement existant
   async update(id: number, updateEventDto: UpdateEventDto): Promise<Event> {
+    // Vérifier que l'événement existe
+    const existingEvent = await this.findOne(id);
+
+    // Mettre à jour l'événement
     await this.eventRepository.update(id, updateEventDto);
 
+    // Rafraîchir les relations
     const updatedEvent = await this.findOne(id);
 
-    // Rafraîchir le cache
+    // Invalidation du cache
     await this.cacheManager.del(`events_page_*`);
 
     return updatedEvent;
@@ -105,11 +165,13 @@ export class EventService {
 
   // Supprimer un événement
   async remove(id: number): Promise<void> {
+    // Vérifier que l'événement existe
     const event = await this.findOne(id);
 
+    // Supprimer l'événement
     await this.eventRepository.remove(event);
 
-    // Supprimer le cache
+    // Supprimer du cache
     await this.cacheManager.del(`events_page_*`);
   }
 }

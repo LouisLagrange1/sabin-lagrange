@@ -18,7 +18,10 @@ export class GameService {
 
   // Créer un nouveau jeu
   async create(createGameDto: CreateGameDto): Promise<Game> {
+    // Créer une instance de jeu avec les données du DTO
     const game = this.gameRepository.create(createGameDto);
+
+    // Sauvegarder et retourner l'événement
     return this.gameRepository.save(game);
   }
 
@@ -33,12 +36,15 @@ export class GameService {
     const cacheKey = `games_page_${page}_limit_${limit}_name_${gameName}_type_${gameType}_user_${userId}`;
     const cachedData = await this.cacheManager.get<Game[]>(cacheKey);
 
+    // Si des données sont en cache, les retourner
     if (cachedData) {
       return cachedData;
     }
 
+    // Création de la requête
     const query = this.gameRepository.createQueryBuilder('game');
 
+    // Pagination
     query.skip((page - 1) * limit).take(limit);
 
     // Filtrage par nom de jeu
@@ -60,18 +66,23 @@ export class GameService {
       query.andWhere('game.users.id = :userId', { userId });
     }
 
+    // Exécution de la requête
     const games = await query.getMany();
-    await this.cacheManager.set(cacheKey, games, 300); // Mise en cache pour 5 minutes
+
+    // Mise en cache pour 5 minutes
+    await this.cacheManager.set(cacheKey, games, 300);
 
     return games;
   }
 
+  // Trouver un jeu par ID avec les utilisateurs associés
   async findOne(id: number): Promise<Game> {
     const game = await this.gameRepository.findOne({
       where: { id },
       relations: ['users'], // Charger les utilisateurs qui ont proposé le jeu
     });
 
+    // Si le jeu n'est pas trouvé, lancer une exception
     if (!game) {
       throw new NotFoundException(`Game with ID ${id} not found`);
     }
